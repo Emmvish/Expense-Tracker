@@ -3,13 +3,19 @@ import React from 'react';
 // import {removeExpense} from "../actions/expenses"
 import {Link} from 'react-router-dom'
 // import { sortByAmount} from '../actions/filters';
+import moment from 'moment'
+import numeral from 'numeral'
 
 const ExpenseListItem = ({dispatch, description, id, amount, createdAt})=>{
     const editLink = "/edit/" + id;
     return (
         <div>
             <Link to={editLink}><h3>{description}</h3></Link>
-            <p>{amount} - {createdAt}</p>
+            <p>
+                {numeral(amount/100).format('$0,0.00')} 
+                    - 
+                {moment(createdAt).format('MMM Do, YYYY')}
+            </p>
         </div>
     )
 }
