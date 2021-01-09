@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Render ExpenseDashboardPage Component 1`] = `
+<div>
+  <Connect(ExpenseList) />
+</div>
+`;
