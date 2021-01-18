@@ -1,38 +1,42 @@
-// Higher Order Component - It can render several components at the same time. Promotes reusability of code.
+// Higher Order Component (HOC) - A component (HOC) that renders another component
+// Reuse code
+// Render hijacking
+// Prop manipulation
+// Abstract state
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const Info = (props)=>(
+const Info = (props) => (
+  <div>
+    <h1>Info</h1>
+    <p>The info is: {props.info}</p>
+  </div>
+);
+
+const withAdminWarning = (WrappedComponent) => {
+  return (props) => (
     <div>
-        <h1>Info</h1>
-<p>The information is: {props.info}</p>
+      {props.isAdmin && <p>This is private info. Please don't share!</p>}
+      <WrappedComponent {...props} />
     </div>
-)
+  );
+};
 
-
-const withAdminWarning = (WrappedComponent)=>{
-    return (props)=>(
-        <div>
-            {props.isAdmin && <p>WARNING MESSAGE</p>}
-            <WrappedComponent {...props}/>
-        </div>
-    )
-}
-
+const requireAuthentication = (WrappedComponent) => {
+  return (props) => (
+    <div>
+      {props.isAuthenticated ? (
+        <WrappedComponent {...props} />
+      ) : (
+          <p>Please login to view the info</p>
+        )}
+    </div>
+  );
+};
 
 const AdminInfo = withAdminWarning(Info);
+const AuthInfo = requireAuthentication(Info);
 
-const withAuthentication = (WrappedComponent)=>{
-    return (props)=>(
-        <div>
-            {!props.isAuthenticated && <p>Login to see this information.</p>}
-            {props.isAuthenticated && <WrappedComponent {...props}/>}
-        </div>
-    )
-}
-
-const AuthInfo = withAuthentication(Info);
-
-// ReactDOM.render(<AdminInfo info="Whatever" isAdmin={true}/>, document.getElementById('app'));
-ReactDOM.render(<AuthInfo info="Whatever" isAuthenticated={true}/>, document.getElementById('app'));
+// ReactDOM.render(<AdminInfo isAdmin={true} info="There are the details" />, document.getElementById('app'));
+ReactDOM.render(<AuthInfo isAuthenticated={true} info="There are the details" />, document.getElementById('app'));

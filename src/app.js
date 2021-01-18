@@ -3,23 +3,51 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import AppRouter from './routers/AppRouter';
 import configureStore from './store/configureStore';
-import { addExpense } from './actions/expenses';
-import { setTextFilter, sortByDate } from './actions/filters';
+import { startSetExpenses } from './actions/expenses';
+import { login, logout } from './actions/auth';
 import getVisibleExpenses from './selectors/expenses';
-// import 'normalize.css/normalize.css';
-// import './styles/styles.scss';
-// import 'react-dates/lib/css/_datepicker.css';
+import 'normalize.css/normalize.css';
+import './styles/styles.scss';
+import 'react-dates/lib/css/_datepicker.css';
+import { firebase } './firebase/firebase';
+import { history } from './routers/AppRouter'
+import LoadingPage from './components/LoadingPage'
+
 
 const store = configureStore();
 
-const JSX = ()=>{
-    return (
-        <div>
-            <Provider store={store}>
-                {AppRouter}
-            </Provider>
-        </div>
-    )
+const jsx = (
+  <Provider store={store}>
+    <AppRouter />
+  </Provider>
+);
+
+let hasRendered = false;
+
+const renderApp = ()=>{
+	if(!hasRendered){
+		ReactDOM.render(jsx, document.getElementById('app'));
+		hasRendered = true;
+	}
 }
 
-ReactDOM.render(<JSX />, document.getElementById('app'));
+ReactDOM.render(<LoadingPage />, document.getElementById('app'));
+
+
+
+firebase.auth().onAuthStateChanged((user)=>{
+	if(user) {
+		store.dispatch(login(user.uid))
+		store.dispatch(startSetExpenses()).then(()=>{
+			renderApp();
+			// If user is on login page, redirect them to dashboard page.
+			if(history.path.location === '/'){
+				history.push('/dashboard');
+			}	
+		})
+	} else {
+		store.dispatch(logout());
+		renderApp();
+		history.push('/');
+	}
+})

@@ -1,30 +1,38 @@
 import React from 'react';
-import {EditExpensePage} from '../../components/EditExpensePage'
-import {shallow} from 'enzyme'
-import expenses from '../fixtures/expenses'
+import { shallow } from 'enzyme';
+import expenses from '../fixtures/expenses';
+import { EditExpensePage } from '../../components/EditExpensePage';
 
-let editExpense, removeExpense, history, wrapper, expense;
+let startEditExpense, startRemoveExpense, history, wrapper;
 
-beforeEach(()=>{
-    editExpense = jest.fn();
-    removeExpense = jest.fn();
-    history = {push: jest.fn() };
-    expense = expense[1];
-    wrapper = shallow(<EditExpensePage editExpense={editExpense} removeExpense={removeExpense} history={history} expense={expense}/>);
-})
+beforeEach(() => {
+  startEditExpense = jest.fn();
+  startRemoveExpense = jest.fn();
+  history = { push: jest.fn() };
+  wrapper = shallow(
+    <EditExpensePage
+      startEditExpense={startEditExpense}
+      startRemoveExpense={startRemoveExpense}
+      history={history}
+      expense={expenses[2]}
+    />
+  );
+});
 
-test('Render EditExpensePage Correctly', ()=>{
-    expect(wrapper).toMatchSnapshot();
-})
+test('should render EditExpensePage', () => {
+  expect(wrapper).toMatchSnapshot();
+});
 
-test('Handling onSubmit form', ()=>{
-    wrapper.find('ExpenseForm').prop('onSubmit')(expenses[1])
-    expect(history.push).toHaveBeenCalledWith("/")
-    expect(editExpense).toHaveBeenCalledWith(expense.id,expenses[1])
-})
+test('should handle editExpense', () => {
+  wrapper.find('ExpenseForm').prop('onSubmit')(expenses[2]);
+  expect(history.push).toHaveBeenLastCalledWith('/');
+  expect(startEditExpense).toHaveBeenLastCalledWith(expenses[2].id, expenses[2]);
+});
 
-test('Handling Expense Removal by onClick', ()=>{
-    wrapper.find('button').simulate('click');
-    expect(history.push).toHaveBeenCalledWith("/")
-    expect(removeExpense).toHaveBeenCalledWith({id: expense.id})
-})
+test('should handle removeExpense', () => {
+  wrapper.find('button').simulate('click');
+  expect(history.push).toHaveBeenLastCalledWith('/');
+  expect(startRemoveExpense).toHaveBeenLastCalledWith({
+    id: expenses[2].id
+  });
+});
